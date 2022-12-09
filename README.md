@@ -28,3 +28,4 @@ More important features of pheatmap include:
 Many of these features are on display in the next figure
 
 ![pheatmap_example](https://cloud.githubusercontent.com/assets/181403/12646618/30b70a76-c59f-11e5-8fdb-aab0fda50726.png)
+# biostat840-project3-pkgdown-carolinerwensel
