@@ -2,9 +2,8 @@ url: ~
 template:
   bootstrap: 5
   bootswatch: litera                            # customization 1: theme
-  bslib:                                        
-    base_font: {google: "Jost"}                 # customization 2: base, heading, and code fonts 
-    heading_font: {google: "Jost"}
+  bslib:                 
+    heading_font: {google: "Jost"}              # customization 2: heading, and code fonts
     code_font: {google: "JetBrains Mono"}
     primary: "#306cc9"                          # customization 3: link and  hover color in the navbar and sidebar 
   theme: haddock                                # customization 4: syntax highlighting in code blocks

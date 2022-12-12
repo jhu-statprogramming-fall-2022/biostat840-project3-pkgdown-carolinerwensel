@@ -20,7 +20,7 @@ control over heatmap dimensions and appearance.
 Website customization
 
 (1) theme: litera
-(2) base, heading, and code fonts
+(2) heading, and code fonts
 (3) link and  hover color in the navbar and sidebar
 (4) syntax highlighting in code blocks
 (5) navbar background color
@@ -53,7 +53,10 @@ Many of these features are on display in the next figure
 
 ![pheatmap_example](https://cloud.githubusercontent.com/assets/181403/12646618/30b70a76-c59f-11e5-8fdb-aab0fda50726.png)
 
-## Exported functions
+## Exported functions/ arguments
+
+``` pheatmap ```
+draw heatmap. 
 
 ``` mat ```
 numeric matrix of the values to be plotted.

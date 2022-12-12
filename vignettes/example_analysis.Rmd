@@ -16,4 +16,202 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(pheatmap)
+library(here)
+library(tidyverse)
+library(stringr)
+library(lubridate)
+library(tidytuesdayR)
 ```
+
+
+## Part 1C: Create an example data analysis
+
+### 3C.1.
+
+**Question**: How do coffee ratings vary by the species of coffee bean (arabica or robusta) and location?
+
+**Original data** The data are from the Coffee Quality Database courtesy of Buzzfeed Data Scientist James LeDoux. <https://github.com/jldbc/coffee-quality-database>
+
+**Data directory**: The data directories are accessible via TidyTuesday. <https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-07-07/readme.md>
+
+
+### 3C.2
+
+```{r}
+# tests if a directory named "data" exists locally
+if(!dir.exists(here("data"))) { dir.create(here("data")) }
+
+# saves data only once (not each time you knit a R Markdown)
+if(!file.exists(here("data", "coffee_ratings.csv"))) {
+coffee_ratings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-07-07/coffee_ratings.csv')
+write_csv(coffee_ratings, file = here("data", "coffee_ratings.csv"))
+}
+
+# read in the data locally each time you knit/render
+coffee_ratings <- read_csv(here("data", "coffee_ratings.csv"))
+```
+
+### 1C.3. Data wrangling and visualization
+
+```{r}
+coffee_ratings$date <- coffee_ratings$grading_date %>%
+  mdy()
+
+coffee_ratings %>%
+  ggplot(aes(date, total_cup_points)) +
+  geom_smooth(aes(color = species)) +
+  labs(
+    title = "Coffee bean ratings over time",
+    subtitle = "Arabica and robusta beans", 
+    caption = "2010 - 2018",
+    x = "Time (Years)", 
+    y = "Cup points") +
+  labs(color = "Bean species") +
+  theme_minimal() +
+  theme(legend.background=element_blank(), 
+        legend.key = element_blank())
+
+```
+
+
+```{r}
+coffee_ratings$year <- coffee_ratings$date %>%
+  year()
+
+coffee_ratings %>%
+  filter(year >= 2012, year <= 2017) %>%
+  group_by(country_of_origin) %>%
+  summarise(total_points = sum(total_cup_points))%>%
+  drop_na() %>%
+  arrange(desc(total_points)) %>%
+  slice(1:25) %>%
+  mutate(country_order = fct_reorder(country_of_origin, total_points)) %>%
+  ggplot(aes(country_order, total_points)) +
+  geom_col() +
+  coord_flip()+
+  labs(
+    title = "Top 25 coffee bean countries",
+    subtitle = "2012 - 2017",
+    caption = "Arabica and robusta beans combined",
+    y = "Cup points",
+    x = "Country") +
+  theme_minimal()
+```
+
+```{r}
+coffee_ratings %>%
+  filter(year >= 2012, year <= 2017) %>%
+  filter(country_of_origin == "Mexico" | country_of_origin == "Guatemala" | country_of_origin =="Colombia" |
+         country_of_origin == "Brazil"| country_of_origin == "Taiwan") %>%
+  group_by(country_of_origin, species) %>%
+  summarise(total_points = sum(total_cup_points)) %>%
+  arrange(desc(total_points))
+  
+```
+
+```{r}
+coffee_species <- coffee_ratings %>%
+  split(coffee_ratings$species)
+
+coffee_species %>%
+  map_dbl(.f = ~mean(.x$total_cup_points))
+
+coffee_ratings %>%
+  select(c("aroma", "flavor", "aftertaste", "acidity", "body", "balance", "uniformity", "sweetness"))%>%
+  split(coffee_ratings$species) %>%
+  map(.f = ~colMeans(.x))
+```
+
+
+```{r}
+coffee_ratings_long <- coffee_ratings %>%
+  pivot_longer(
+    cols = c("aroma", "flavor", "aftertaste", "acidity", "body", "balance", "uniformity", "sweetness"),
+    names_to = "rating_name", 
+    values_to = "rating_grade")
+
+coffee_ratings_long %>%
+  filter(year >= 2012, year <= 2017, rating_grade > 2) %>%
+  group_by(species) %>%
+  ggplot(aes(species, rating_grade)) +
+  geom_violin(aes(fill = species)) +
+  facet_wrap(vars(rating_name)) +
+  labs(
+    title = "Coffee attributes by bean species",
+    subtitle = "Arabica and robusta beans", 
+    caption = "2012 - 2017",
+    x = "Bean species", 
+    y = "Rating grade (points)") +
+  labs(fill = "Bean species") +
+  theme_minimal() +
+  theme(legend.background=element_blank(), 
+        legend.key = element_blank())
+
+```
+
+```{r}
+coffee_heatmap <- coffee_ratings %>%
+  filter(species == "Arabica") %>%
+  select(c("country_of_origin", "aroma", "flavor", "aftertaste", "acidity", "body", "balance", "uniformity", "sweetness")) %>%
+  group_by(country_of_origin) %>%
+  summarise(aroma_rating = mean(aroma),
+            flavor_rating = mean(flavor),
+            aftertaste_rating = mean(aftertaste), 
+            acidity_rating = mean(acidity), 
+            body_rating = mean(body),
+            balance_rating = mean(balance), 
+            uniformity_rating = mean(uniformity), 
+            sweetness_rating = mean(sweetness)) %>%
+  drop_na()
+  
+
+names(coffee_heatmap) <- c("country_of_origin", "aroma", "flavor", "aftertaste", "acidity", "body", "balance", "uniformity", "sweetness")
+
+coffee_heatmap <- column_to_rownames(coffee_heatmap, var = "country_of_origin")
+
+pheatmap(coffee_heatmap)
+
+pheatmap(coffee_heatmap, cluster_rows = F, cluster_cols = F)
+
+pheatmap(coffee_heatmap, cluster_rows = T, cluster_cols = F)
+
+
+```
+
+### 1C.5 Results summary
+Arabica coffee beans appear to be more popular and have higher ratings overtime. Additionally, the five countries with the highest coffee ratings only produce arabica beans. 
+
+### 1C.6. Functions used
+
+#### dplyr
+(1) group_by
+(2) summarise
+(3) arrange
+(4) slice
+(5) filter
+(6) mutate
+
+#### tidyr
+(1) pivot_longer
+(2) drop_na
+
+#### forcats
+(1) fct_reorder
+
+#### lubridate
+(1) mdy
+(2) year
+
+#### purrr
+(1) map
+(2) map_dbl
+
+#### ggplot2
+(1) geom_smooth
+(2) geom_violin
+(3) geom_col
+
+#### pheatmap
+(1) pheatmap
+(2) cluster_rows
+(3) cluster_cols
