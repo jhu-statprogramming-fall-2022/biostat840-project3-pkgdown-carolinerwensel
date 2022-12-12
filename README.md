@@ -43,7 +43,7 @@ URL to the GitHub link to where the original R package came from:
 <https://github.com/raivokolde/pheatmap>
 
 URL to the deployed website:
-<https://jhu-statprogramming-fall-2022.github.io/biostat840-project3-pkgdown-carolinerwensel/articles/example_analysis.html>
+<https://jhu-statprogramming-fall-2022.github.io/biostat840-project3-pkgdown-carolinerwensel/index.html>
 
 ## Features
 
