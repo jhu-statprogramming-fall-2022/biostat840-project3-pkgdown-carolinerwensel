@@ -39,7 +39,11 @@ You can install the development version using `devtools`
 library(devtools)
 install_github("raivokolde/pheatmap")
 ```
+URL to the GitHub link to where the original R package came from:
 <https://github.com/raivokolde/pheatmap>
+
+URL to the deployed website:
+<https://>
 
 ## Features
 

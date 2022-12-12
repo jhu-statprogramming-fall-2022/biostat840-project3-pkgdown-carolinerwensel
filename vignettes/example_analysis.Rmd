@@ -149,6 +149,7 @@ coffee_ratings_long %>%
 
 ```
 
+### 1C.4. Apply at functions from pheatmap
 ```{r}
 coffee_heatmap <- coffee_ratings %>%
   filter(species == "Arabica") %>%
@@ -170,16 +171,14 @@ names(coffee_heatmap) <- c("country_of_origin", "aroma", "flavor", "aftertaste",
 coffee_heatmap <- column_to_rownames(coffee_heatmap, var = "country_of_origin")
 
 pheatmap(coffee_heatmap)
-
 pheatmap(coffee_heatmap, cluster_rows = F, cluster_cols = F)
-
 pheatmap(coffee_heatmap, cluster_rows = T, cluster_cols = F)
 
 
 ```
 
 ### 1C.5 Results summary
-Arabica coffee beans appear to be more popular and have higher ratings overtime. Additionally, the five countries with the highest coffee ratings only produce arabica beans. 
+Arabica coffee beans appear to be more popular and have higher ratings overtime. Additionally, the five countries (Mexico, Guatemala, Colombia, Brazil, Taiwan) with the highest coffee ratings only produce arabica beans and have high ratings for sweetness and uniformity. 
 
 ### 1C.6. Functions used
 
